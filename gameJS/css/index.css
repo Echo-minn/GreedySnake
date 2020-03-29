@@ -1,0 +1,78 @@
+.content{
+    width: 640px;
+    height: 640px;
+    margin: 10px auto 50px;
+    position: relative;
+}
+.btn{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: rgba(0,0,0,0);
+    z-index: 1;
+}
+.btn button{
+    background: none;
+    border:none;
+    background-size: 100% 100%;
+    cursor: pointer;
+    outline: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
+.startBtn button{
+    width: 200px;
+    height: 80px;
+    background-image: url('../images/start.png');
+    margin-left: -100px;
+    margin-top: -75px;
+}
+.pauseBtn{
+    display: none;
+}
+.pauseBtn button{
+    width: 200px;
+    height: 80px;
+    background-image: url('../images/pause.png');
+    margin-left: -100px;
+    margin-top: -75px;
+}
+#snakeWrap{
+    position: relative;
+    width: 600px;
+    height: 600px;
+    background: #FCE4EC;
+    border: 20px solid #F8BBD0;
+}
+.snakeHead{
+    background-image: url('../images/head.png');
+    background-size: cover;
+}
+.snakeBody{
+    background: url('../images/草莓.png') no-repeat;
+    background-size: cover;
+}
+.food{
+    background: url('../images/草莓.png') no-repeat;
+    background-size: 100% 100%;
+}
+#jiansu{
+    border-radius: 5px;
+    max-width: 115px;
+    max-height: 46px;
+    cursor: pointer;
+}
+#jiasu{
+    border-radius: 5px;
+    max-width: 100px;
+    max-height: 40px;
+    cursor: pointer;
+}
+td{
+    horiz-align: center;
+    display: table-cell;
+    padding-right: 15px;
+}
