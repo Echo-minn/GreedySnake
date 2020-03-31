@@ -12,6 +12,9 @@ var speed = null,
 function Speed() {
     this.initspeed = 150;
 }
+Speed.prototype.init = function (){
+    this.initspeed = 150;
+};
 
 Speed.prototype.speedup = function () {
     if (this.initspeed >= 50) {
@@ -129,7 +132,12 @@ Snake.prototype.getNextPos = function () {
     if (selfCollied) {
         document.getElementById('gameoveraudio').play();
         console.log('撞到了自己');
-        alert("撞到自己了");
+        if (game.score>=parseInt(localStorage.getItem('BestScore'))){
+            alert("GAME OVER! Best Score: "+game.score+'\n不要撞自己吖！');
+            localStorage.setItem('BestScore',game.score)
+        } else{
+            alert("GAME OVER! Best Score: "+parseInt(localStorage.getItem('BestScore'))+'\n不要撞自己吖！');
+        }
         this.strategies.die.call(this);
         return;
     }
@@ -137,7 +145,12 @@ Snake.prototype.getNextPos = function () {
     if (nextPos[0] < 0 || nextPos[1] < 0 || nextPos[0] > td - 1 || nextPos[1] > tr - 1) {
         document.getElementById('gameoveraudio').play();
         console.log('撞到墙了');
-        alert('撞到墙了');
+        if (game.score>=parseInt(localStorage.getItem('BestScore'))){
+            alert("GAME OVER! Best Score: "+game.score+'\n不要撞墙吖！');
+            localStorage.setItem('BestScore',game.score)
+        } else{
+            alert("GAME OVER! Best Score: "+parseInt(localStorage.getItem('BestScore'))+'\n不要撞墙吖！');
+        }
         this.strategies.die.call(this);
         return;
     }
@@ -197,6 +210,9 @@ Snake.prototype.strategies = {
         createFood();
         console.log('创建新食物啦');
         game.score++;
+        speed.speedup();
+        var speednow = 250 - speed.initspeed;
+        document.getElementById('speed').innerText = speednow;
         document.getElementById("score").innerHTML = game.score + " 分";
     },
     die: function () {
@@ -343,6 +359,7 @@ startBtn.onclick = function () {
     startBtn.parentNode.style.display = 'none';
     game.i = 0;
     game.init();
+    speed.init();
 };
 
 // 暂停游戏
