@@ -43,6 +43,7 @@ Square.prototype.create = function () { // 创建方块dom
     this.viewContent.style.height = sh + 'px';
     this.viewContent.style.left = this.x + 'px';
     this.viewContent.style.top = this.y + 'px';
+    this.viewContent.style.backgroundImage = '';
 
     this.parent.appendChild(this.viewContent)
 
@@ -145,6 +146,7 @@ Snake.prototype.getNextPos = function () {
     if (food && food.pos[0] == nextPos[0] && food.pos[1] == nextPos[1]) {
         // 如果这个条件成立说明现在蛇头要走的下一个点是食物的那个点；
         console.log('吃到食物了');
+        document.getElementById('eataudio').play();
         this.strategies.eat.call(this);
         return;
     }
@@ -193,9 +195,9 @@ Snake.prototype.strategies = {
     eat: function () {
         this.strategies.move.call(this, true);
         createFood();
+        console.log('创建新食物啦');
         game.score++;
         document.getElementById("score").innerHTML = game.score + " 分";
-        document.getElementById('eataudio').play();
     },
     die: function () {
         //document.getElementById('gameoveraudio').play();
@@ -216,7 +218,7 @@ function createFood() {
     while (include) {
         x = Math.round(Math.random() * (td - 1));
         y = Math.round(Math.random() * (tr - 1));
-        z = Math.round(Math.random() * (4 - 1));
+        z = parseInt(Math.floor(Math.random() * 400));
         snake.pos.forEach(function (value) {
             if (x != value[0] && y != value[1]) {
                 // 坐标不在蛇身上
@@ -226,23 +228,28 @@ function createFood() {
         // 生成食物
         food = new Square(x, y, 'food');
         food.pos = [x, y]; // 存储食物的坐标，用于跟蛇头下一个走的点作对比
-
         var foodDom = document.querySelector('.food');
         if (foodDom) {
             foodDom.style.left = x * sw + 'px';
             foodDom.style.top = y * sh + 'px';
-            switch (z) {
+            switch (z % 4) {
                 case 1:
-                    foodDom.style.background='images/樱桃.png';
+                    foodDom.style.backgroundImage = 'images/樱桃.png';
+                    console.log('新食物的样子：', foodDom.getAttribute('style'), foodDom.getAttributeNames());
+                    console.log(foodDom.style);
                     break;
                 case 2:
-                    foodDom.style.background='images/西瓜.png';
+                    foodDom.style.backgroundImage = 'images/西瓜.png';
+                    console.log('新食物的样子：', foodDom.getAttribute('style'), foodDom.getAttributeNames());
                     break;
                 case 3:
-                    foodDom.style.background='images/礼物.png';
+                    foodDom.style.backgroundImage = 'images/礼物.png';
+                    console.log('新食物的样子：', foodDom.getAttribute('style'));
                     break;
                 default:
-                    foodDom.style.background='images/草莓.png';
+                    console.log('新食物的样子：', foodDom.style);
+                    foodDom.style.backgroundImage = 'images/草莓.png';
+                    console.log('新食物的样子：', foodDom.getAttribute('style'), foodDom.getAttributeNames());
                     break;
             }
         } else {
@@ -258,6 +265,9 @@ function createFood() {
 function Game() {
     this.timer = null;
     this.score = 0;
+    this.pausetime = 0;
+    this.start_time = new Date().getTime();
+    this.i = 0;
 }
 
 Game.prototype.init = function () {
@@ -276,35 +286,40 @@ Game.prototype.init = function () {
             snake.direction = snake.directionNum.down;
         }
     };
-
+    document.getElementById("timer").innerHTML = "0h 0m 0s";
+    document.getElementById("score").innerHTML = "0 分";
     this.start();
-
 };
 Game.prototype.start = function () {
     // 开始游戏
-    document.getElementById("timer").innerHTML = "0h 0m 0s";
-    document.getElementById("score").innerHTML = "0 分";
-    this.timer = setInterval(function () {
-        snake.getNextPos();
-    }, 150);
-    var startTime = new Date().getTime();
+    if (game.i === 0) {
+        game.start_time = new Date().getTime();
+    }
     var countTime = function () {
         var nowtime = parseInt(new Date().getTime());
-        var time = parseInt((nowtime - startTime) / 1000);
+        var time = parseInt((nowtime - game.start_time) / 1000) - game.pausetime;
         var second = parseInt(time % 60);
         var minute = parseInt((time / 60) % 60);
         var hour = parseInt((time / (60 * 60)) % 24);
+        console.log('开始时长: ', (nowtime - game.start_time) / 1000);
         document.getElementById("timer").innerHTML = hour + "h " + minute + "m " + second + "s";
     };
-    this.time = setInterval(countTime, 1000)
+    this.time = setInterval(countTime, 1000);
+    this.timer = setInterval(function () {
+        snake.getNextPos();
+    }, 150);
+    clearInterval(this.tim);
 };
 Game.prototype.pause = function () {
     clearInterval(this.timer);
     clearInterval(this.time);
+    game.i = game.i + 1;
 };
 Game.prototype.over = function () {
     clearInterval(this.time);
     clearInterval(this.timer);
+    clearInterval(this.tim);
+    game.i = 0;
     // 游戏回到最初始的状态
     var snakeWrap = document.getElementById('snakeWrap');
     snakeWrap.innerHTML = '';
@@ -314,12 +329,19 @@ Game.prototype.over = function () {
     var startBtnWrap = document.querySelector('.startBtn');
     startBtnWrap.style.display = 'block';
 };
+Game.prototype.pausetim = function () {
+    this.tim = setInterval(function () {
+        game.pausetime = game.pausetime + 1;
+        console.log('暂停总时长: ', game.pausetime)
+    }, 1000);
+};
 // 开启游戏
 game = new Game();
 
 var startBtn = document.querySelector('.startBtn button');
 startBtn.onclick = function () {
     startBtn.parentNode.style.display = 'none';
+    game.i = 0;
     game.init();
 };
 
@@ -328,10 +350,12 @@ var snakeWrap = document.getElementById('snakeWrap');
 var pauseBtn = document.querySelector('.pauseBtn button');
 snakeWrap.onclick = function () {
     game.pause();
+    game.pausetim();
     pauseBtn.parentNode.style.display = 'block';
 };
 pauseBtn.onclick = function () {
     game.start();
+    clearInterval(this.tim);
     pauseBtn.parentNode.style.display = 'none';
 };
 

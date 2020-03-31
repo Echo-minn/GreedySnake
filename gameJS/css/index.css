@@ -59,6 +59,18 @@
     background: url('../images/草莓.png') no-repeat;
     background-size: 100% 100%;
 }
+.food1{
+    background:url('../images/西瓜.png') no-repeat;
+    background-size: 100% 100%
+}
+.food2{
+    background:url('../images/礼物.png') no-repeat;
+    background-size: 100% 100%
+}
+.food3 {
+    background: url('../images/樱桃.png') no-repeat;
+    background-size: 100% 100%
+}
 #jiansu{
     border-radius: 5px;
     max-width: 115px;
